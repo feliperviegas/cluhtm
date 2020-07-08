@@ -40,8 +40,7 @@ For more information about building and running a docker container, see: https:/
 
 
 ### Cite
-CluWords Representation
-
+Conference paper:
 ```@inproceedings{viegas2019cluhtm,
 title={CluHTM - Semantic Hierarchical Topic Modeling based on CluWords},
 author={Viegas, Felipe and Cunha, Washington and Gomes, Christian and  Pereira Antonio and Rocha, Leonardo and Gonçalves, Marcos André},
