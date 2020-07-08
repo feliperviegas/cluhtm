@@ -26,7 +26,7 @@ Once installed, setup the paths in the startup file :
 
 Build docker container:
 
-```docker build -t cluhtm```
+```docker build -t cluhtm <project_path>```
 
 Run docker container:
 
