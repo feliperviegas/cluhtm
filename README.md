@@ -1,4 +1,4 @@
-# Hierarchical Non-Probabilistic Topic Modeling using CluWords Representation
+# CluHTM - Semantic Hierarchical Topic Modeling based on CluWords
 
 This is the code for the paper:
 
