@@ -14,7 +14,7 @@ kiwisolver
 pytz
 gensim 
 scikit-learn 
-joblib 
+joblib
 prettytable 
 nimfa 
 pillow 

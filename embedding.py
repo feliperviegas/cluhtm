@@ -46,8 +46,7 @@ class CreateEmbeddingModels:
         n_words: int
             Number of words of dataset present in the pre-treined model.
         """
-        documents = self._read_raw_dataset(
-            self.document_path, dataset)
+        documents = self._read_raw_dataset(self.document_path)
 
         # Count the words in dataset
         dataset_cv = CountVectorizer().fit(documents)
@@ -87,8 +86,8 @@ class CreateEmbeddingModels:
             embedding_file_path, binary=binary)
         print('Embedding model read in %0.3fs.' % (time() - t0))
 
-    def _read_raw_dataset(self, document_path, dataset):
-        arq = open(document_path + '/' + str(dataset) + 'Pre.txt', 'r', encoding="utf-8")
+    def _read_raw_dataset(self, document_path):
+        arq = open(document_path, 'r', encoding="utf-8")
         doc = arq.readlines()
         arq.close()
         documents = list(map(str.rstrip, doc))

@@ -199,14 +199,12 @@ def print_herarchical_structure(output, hierarchy, depth=0, parent='-1', son=0):
 
 
 def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
-                    path_to_save_results, n_threads, k, threshold, cossine_filter,
-                    has_class, class_path, algorithm_type, debug=3):
+                    path_to_save_results, n_threads, k, threshold, class_path, algorithm_type, debug=3):
     log.basicConfig(filename="{}.log".format(dataset), filemode="w", level=max(50 - (debug * 10), 10),
                     format='%(asctime)-18s %(levelname)-10s [%(filename)s:%(lineno)d] %(message)s',
                     datefmt='%d/%m/%Y %H:%M', )
     # Path to files and directories
     embedding_file_path = """{}/{}.txt""".format(path_to_save_model, dataset)
-    dataset_file_path = """{}/{}Pre.txt""".format(datasets_path, dataset)
     path_to_save_results = '{}/{}'.format(path_to_save_results, dataset)
     # path_to_save_pkl = '{}/pkl'.format(path_to_save_results)
 
@@ -225,16 +223,15 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
              )
 
     cluwords = CluwordsTFIDF(dataset=dataset,
-                             dataset_file_path=dataset_file_path,
+                             dataset_file_path=datasets_path,
                              n_words=word_count,
-                             cossine_filter=cossine_filter,
                              path_to_save_cluwords=path_to_save_results,
-                             class_file_path=class_path,
-                             has_class=has_class)
+                             class_file_path=class_path)
     log.info('Computing TFIDF...')
     cluwords_tfidf = cluwords.fit_transform()
     cluwords_tfidf_temp = cluwords_tfidf.copy()
     cluwords_tfidf_temp = csr_matrix(cluwords_tfidf_temp)  # Convert the cluwords_tfidf array matrix to a sparse cluwords
+    # RANGE OF TOPICS THAT WILL BE EXPLOIT BY THE STRATEGY
     k_min = 5
     k_max = 20
     n_runs = 5
@@ -320,11 +317,10 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
 
 
 def save_cluword_representation(dataset, word_count, path_to_save_model, datasets_path,
-                    path_to_save_results, n_threads, k, threshold, cossine_filter,
-                    has_class, class_path, algorithm_type):
+                    path_to_save_results, n_threads, k, threshold,
+                    class_path, algorithm_type):
     # Path to files and directories
     embedding_file_path = """{}/{}.txt""".format(path_to_save_model, dataset)
-    dataset_file_path = """{}/{}Pre.txt""".format(datasets_path, dataset)
     path_to_save_results = '{}/{}'.format(path_to_save_results, dataset)
     # path_to_save_pkl = '{}/pkl'.format(path_to_save_results)
 
@@ -343,12 +339,10 @@ def save_cluword_representation(dataset, word_count, path_to_save_model, dataset
              )
 
     cluwords = CluwordsTFIDF(dataset=dataset,
-                             dataset_file_path=dataset_file_path,
+                             dataset_file_path=datasets_path,
                              n_words=word_count,
-                             cossine_filter=cossine_filter,
                              path_to_save_cluwords=path_to_save_results,
-                             class_file_path=class_path,
-                             has_class=has_class)
+                             class_file_path=class_path)
     log.info('Computing TFIDF...')
     cluwords_tfidf = cluwords.fit_transform()
     np.savez_compressed('{}/cluwords_representation_{}.npz'.format(path_to_save_results, dataset),

@@ -110,31 +110,26 @@ class CluwordsTFIDF:
 
     """
 
-    def __init__(self, dataset, dataset_file_path, n_words, path_to_save_cluwords, class_file_path=None,
-                 has_class=False, cossine_filter=1.0):
+    def __init__(self, dataset, dataset_file_path, n_words, path_to_save_cluwords, class_file_path=None):
         self.dataset_file_path = dataset_file_path
         self.path_to_save_cluwords_tfidf = path_to_save_cluwords + '/cluwords_features.libsvm'
         self.n_words = n_words
         self.cluwords_tf_idf = None
         self.cluwords_idf = None
-        self.cossine_filter = cossine_filter
         loaded = np.load('cluwords_{}.npz'.format(dataset))
         self.vocab = loaded['index']
         self.vocab_cluwords = loaded['cluwords']
         self.cluwords_data = loaded['data']
-        self.has_class = has_class
 
-        if self.has_class:
-            self.Y = []
-            with open(class_file_path, 'r', encoding="utf-8") as input_file:
-                for _class in input_file:
-                    self.Y.append(np.int(_class))
-                input_file.close()
-                self.Y = np.asarray(self.Y)
+        self.Y = []
+        with open(class_file_path, 'r', encoding="utf-8") as input_file:
+            for _class in input_file:
+                self.Y.append(np.int(_class))
+            input_file.close()
+            self.Y = np.asarray(self.Y)
 
         print('Matrix{}'.format(self.cluwords_data.shape))
         del loaded
-        print('\nCosine Filter: {}'.format(cossine_filter))
 
         self._read_input()
 
@@ -151,55 +146,6 @@ class CluwordsTFIDF:
 
         # Set number of cluwords
         self.n_cluwords = self.n_words
-
-        """
-        # Redundant Cluwords to remove #######################################
-        print('Search for redundant cluwords...')
-        m_cluwords = []
-        for w_1 in range(len(self.vocab)):
-            hw_w_1 = list(self.cluwords_data[w_1])
-            m_cluwords.append(hw_w_1)
-
-        m_cluwords = np.asarray(a=m_cluwords,
-                                  dtype=np.float32)
-
-        print('Fitting Nearest Neighbors...')
-        start = timeit.default_timer()
-        nbrs = NearestNeighbors(n_neighbors=len(self.vocab),
-                                algorithm='auto',
-                                metric='cosine',
-                                n_jobs=1).fit(m_cluwords)
-        end = timeit.default_timer()
-        print('Time {}\n'.format(end - start))
-
-        print('Nearest Neighbors...')
-        start = timeit.default_timer()
-        distance, hw_sim = nbrs.kneighbors(m_cluwords)
-        to_remove = []
-        for _hw in range(len(distance)):
-            if _hw not in to_remove:
-                similarity = (1. - distance[_hw]) >= self.cossine_filter
-                to_remove += [self.vocab[hw_sim[_hw][i]] for i in range(len(similarity)) if
-                              similarity[i] and hw_sim[_hw][i] != _hw]
-
-        # Get arg of list of words -> to_remove
-        to_remove_arg = []
-        for w in to_remove:
-            to_remove_arg.append(int(np.where(self.cluwords == w)[0]))
-        to_remove_arg = np.sort(np.array(to_remove_arg, dtype=np.uint32))
-        # print(to_remove_arg)
-
-        print('Number of redundant cluwords: {}'.format(len(to_remove)))
-        if to_remove:
-            print('Removing redundant cluwords...')
-            # Remove row of matrix
-            self.cluwords_data = np.delete(self.cluwords_data, to_remove_arg, axis=0)
-            # Remove redundant cluwords
-            self.cluwords = np.delete(self.cluwords, to_remove_arg)
-        end = timeit.default_timer()
-        print('Time {}\n'.format(end - start))
-        """
-        ########################################################################
 
         # Set vocabulary of cluwords
         self.n_cluwords = len(self.vocab_cluwords)
@@ -329,8 +275,7 @@ class CluwordsTFIDF:
         tf = self._raw_tf(binary=True, dtype=np.float32)
         with open('{}'.format(self.path_to_save_cluwords_tfidf), 'w', encoding="utf-8") as file:
             for x in range(self.cluwords_tf_idf.shape[0]):
-                if self.has_class:
-                    file.write('{} '.format(self.Y[x]))
+                file.write('{} '.format(self.Y[x]))
                 for y in range(1, self.cluwords_tf_idf.shape[1]):
                     if tf[x][y]:
                         file.write('{}:{} '.format(y + 1, self.cluwords_tf_idf[x][y]))
