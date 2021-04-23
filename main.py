@@ -22,8 +22,11 @@ def main():
 
     DATASETS_PATH = '/{}/textual_folds/{}Pre.txt'.format(MAIN_PATH, DATASET)
     CLASS_PATH = '/{}/textual_folds/{}Class.txt'.format(MAIN_PATH, DATASET)
-    EMBEDDINGS_FILE_PATH = '/{}/wiki-news-300d-1M.vec'.format(MAIN_PATH)
-
+    # EMBEDDINGS_FILE_PATH = '/{}/wiki-news-300d-1M.vec'.format(MAIN_PATH)
+    # EMBEDDINGS_FILE_PATH = '{}/embedding_viegas_concat/embedding_{}Pre_bert_concat_avg'.format(MAIN_PATH,
+    #                                                                                            DATASET)
+    EMBEDDINGS_FILE_PATH = '{}/viegas_dataset_avg_max/embedding_{}Pre_avg'.format(MAIN_PATH,
+                                                                                  DATASET)
 
     try:
         os.mkdir('{}/{}'.format(MAIN_PATH, EMBEDDING_RESULTS))
