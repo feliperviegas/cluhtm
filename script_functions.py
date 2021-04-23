@@ -232,9 +232,9 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
     cluwords_tfidf_temp = cluwords_tfidf.copy()
     cluwords_tfidf_temp = csr_matrix(cluwords_tfidf_temp)  # Convert the cluwords_tfidf array matrix to a sparse cluwords
     # RANGE OF TOPICS THAT WILL BE EXPLOIT BY THE STRATEGY
-    k_min = 5
-    k_max = 20
-    n_runs = 5
+    k_min = 9
+    k_max = 10
+    n_runs = 2
     max_depth = 3
     sufix = "{dataset}_{depth}_{parent_topic}".format(dataset=dataset, depth=0, parent_topic='-1')
     y = set_cluwords_representation(dataset,
@@ -245,6 +245,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
     hierarchy = {}
     while dq:
         log.info("Deque {}".format(dq))
+        log.info("Documents {}".format(dataset))
         sufix = dq.pop()
         log.info("Starting iteration {sufix}".format(sufix=sufix))
         parent = sufix.split("_")[-1]
@@ -290,6 +291,8 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
         tfidf_feature_names = list(cluwords.vocab_cluwords)
         topics_documents = np.argmax(w, axis=1)
 
+        log.info("\n>>X shape = {}".format(X.shape))
+
         dq, hierarchy = save_topics(model=nmf,
                                     tfidf_feature_names=tfidf_feature_names,
                                     cluwords_tfidf=X.toarray(),
@@ -307,6 +310,11 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                                     parent=parent,
                                     hierarchy=hierarchy,
                                     max_depth=max_depth)
+
+        os.remove("reference-{}".format(sufix))
+        os.remove("topic-{}".format(sufix))
+        os.remove("{}.pkl".format(sufix))
+
         log.info('End Iteration...')
 
     log.info(hierarchy)

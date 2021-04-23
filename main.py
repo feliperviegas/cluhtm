@@ -15,13 +15,15 @@ def main():
     EMBEDDING_RESULTS = 'fasttext_wiki'
     PATH_TO_SAVE_RESULTS = '{}/{}/results'.format(MAIN_PATH, EMBEDDING_RESULTS)
     PATH_TO_SAVE_MODEL = '{}/{}/datasets/gn_w2v_models'.format(MAIN_PATH, EMBEDDING_RESULTS)
-    DATASETS_PATH = '/{}/textual_folds/wppPre.txt'.format(MAIN_PATH)
-    EMBEDDINGS_FILE_PATH = '/{}/wiki-news-300d-1M.vec'.format(MAIN_PATH)
     EMBEDDINGS_BIN_TYPE = False
     DATASET = options.dataset
-    CLASS_PATH = '/{}/textual_folds/wppClass.txt'.format(MAIN_PATH)
     N_THREADS = 6
     ALGORITHM_TYPE = 'knn_cosine'
+
+    DATASETS_PATH = '/{}/textual_folds/{}Pre.txt'.format(MAIN_PATH, DATASET)
+    CLASS_PATH = '/{}/textual_folds/{}Class.txt'.format(MAIN_PATH, DATASET)
+    EMBEDDINGS_FILE_PATH = '/{}/wiki-news-300d-1M.vec'.format(MAIN_PATH)
+
 
     try:
         os.mkdir('{}/{}'.format(MAIN_PATH, EMBEDDING_RESULTS))
