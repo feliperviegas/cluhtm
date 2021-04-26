@@ -233,9 +233,9 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
     cluwords_tfidf_temp = cluwords_tfidf.copy()
     cluwords_tfidf_temp = csr_matrix(cluwords_tfidf_temp)  # Convert the cluwords_tfidf array matrix to a sparse cluwords
     # RANGE OF TOPICS THAT WILL BE EXPLOIT BY THE STRATEGY
-    k_min = 9
-    k_max = 10
-    n_runs = 2
+    k_min = 5
+    k_max = 25
+    n_runs = 5
     max_depth = 3
     sufix = "{dataset}_{depth}_{parent_topic}".format(dataset=dataset, depth=0, parent_topic='-1')
     y = set_cluwords_representation(dataset,
@@ -314,7 +314,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
 
         shutil.rmtree("reference-{}".format(sufix))
         shutil.rmtree("topic-{}".format(sufix))
-        os.remove("{}.pkl".format(sufix))
+        # os.remove("{}.pkl".format(sufix))
 
         log.info('End Iteration...')
 
