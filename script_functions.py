@@ -312,8 +312,8 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                                     hierarchy=hierarchy,
                                     max_depth=max_depth)
 
-        shutil.rmtree("reference-{}".format(sufix))
-        shutil.rmtree("topic-{}".format(sufix))
+        # shutil.rmtree("reference-{}".format(sufix))
+        # shutil.rmtree("topic-{}".format(sufix))
         # os.remove("{}.pkl".format(sufix))
 
         log.info('End Iteration...')
