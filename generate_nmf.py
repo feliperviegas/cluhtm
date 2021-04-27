@@ -24,7 +24,7 @@ class GenerateNFM(object):
         if use_nimfa:
             impl = unsupervised.nmf.NimfaNMF(max_iters=maxiter, init_strategy="random", update="euclidean")
         else:
-            impl = unsupervised.nmf.SklNMF(max_iters=maxiter, init_strategy="random")
+            impl = unsupervised.nmf.SklNMF(max_iters=maxiter, init_strategy="nndsvd")
 
         n_documents = X.shape[0]
         n_sample = int(sample_ratio * n_documents)
