@@ -48,8 +48,10 @@ class TopicStability(object):
         metric = unsupervised.rankings.AverageJaccard()
         matcher = unsupervised.rankings.RankingSetAgreement(metric)
         log.info("Performing reference comparisons with {} ...".format(str(metric)))
+        log.info(f"Reference_term_ranking {reference_term_ranking}")
         all_scores = []
         for i in range(r):
+            log.info(f"All_term_rankings {all_term_rankings[i]}")
             score = matcher.similarity(reference_term_ranking, all_term_rankings[i])
             all_scores.append(score)
 

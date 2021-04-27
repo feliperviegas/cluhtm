@@ -235,7 +235,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
     # RANGE OF TOPICS THAT WILL BE EXPLOIT BY THE STRATEGY
     k_min = 5
     k_max = 25
-    n_runs = 5
+    n_runs = 3
     max_depth = 3
     sufix = "{dataset}_{depth}_{parent_topic}".format(dataset=dataset, depth=0, parent_topic='-1')
     y = set_cluwords_representation(dataset,
