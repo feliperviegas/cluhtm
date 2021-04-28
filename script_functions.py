@@ -160,7 +160,7 @@ def save_topics(model, tfidf_feature_names, cluwords_tfidf, best_k, topics_docum
 
         hierarchy[depth][parent][k] = topics[k]
         classes = {}
-        if len(doc_ids_temp) > k_max and depth+1 < max_depth:
+        if (len(doc_ids_temp) > (k_max+4))  and depth+1 < max_depth:
         # if depth < max_depth:
             log.info("Add topic: {} Shape Matrix: {}".format(k, cluwords_tfidf_temp.shape))
             log.info("len(doc_ids): {}".format(len(doc_ids_temp)))
@@ -170,7 +170,7 @@ def save_topics(model, tfidf_feature_names, cluwords_tfidf, best_k, topics_docum
 
                 classes[y[doc_id]].append(doc_id)
 
-            prefix = "{prefix} {k}".format(prefix=out_prefix, k=k)
+            prefix = "{prefix}-{k}".format(prefix=out_prefix, k=k)
             save_corpus(prefix, csr_matrix(cluwords_tfidf_temp), terms, doc_ids, classes)
             dq.appendleft(prefix)
         # else:
@@ -314,8 +314,8 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                                     hierarchy=hierarchy,
                                     max_depth=max_depth)
 
-        # shutil.rmtree("reference-{}".format(sufix))
-        # shutil.rmtree("topic-{}".format(sufix))
+        shutil.rmtree("reference-{}".format(sufix))
+        shutil.rmtree("topic-{}".format(sufix))
         # os.remove("{}.pkl".format(sufix))
 
         log.info('End Iteration...')
