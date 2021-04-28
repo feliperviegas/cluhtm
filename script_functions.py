@@ -286,6 +286,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
         # Fit the NMF model
         log.info("\nFitting the NMF model (Frobenius norm) with tf-idf features, shape {}...".format(X.shape))
         nmf = NMF(n_components=best_k,
+                  init=None,
                   random_state=1,
                   alpha=.1,
                   l1_ratio=.5).fit(X)

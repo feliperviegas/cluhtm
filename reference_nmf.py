@@ -33,7 +33,7 @@ class ReferenceNFM(object):
         if use_nimfa:
             impl = unsupervised.nmf.NimfaNMF(max_iters=maxiter, init_strategy="nndsvd", update="euclidean")
         else:
-            impl = unsupervised.nmf.SklNMF(max_iters=maxiter, init_strategy="nndsvda")
+            impl = unsupervised.nmf.SklNMF(max_iters=maxiter, init_strategy=None)
 
         # Generate reference NMF topic models for the specified numbers of topics
         log.info("Running reference experiments in range k=[{},{}] max_iters={}"
