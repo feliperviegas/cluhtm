@@ -160,7 +160,7 @@ def save_topics(model, tfidf_feature_names, cluwords_tfidf, best_k, topics_docum
 
         hierarchy[depth][parent][k] = topics[k]
         classes = {}
-        if (len(doc_ids_temp) > (k_max+4))  and depth+1 < max_depth:
+        if len(doc_ids_temp) > k_max  and depth+1 < max_depth:
         # if depth < max_depth:
             log.info("Add topic: {} Shape Matrix: {}".format(k, cluwords_tfidf_temp.shape))
             log.info("len(doc_ids): {}".format(len(doc_ids_temp)))
@@ -234,7 +234,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
     cluwords_tfidf_temp = csr_matrix(cluwords_tfidf_temp)  # Convert the cluwords_tfidf array matrix to a sparse cluwords
     # RANGE OF TOPICS THAT WILL BE EXPLOIT BY THE STRATEGY
     k_min = 5
-    k_max = 25
+    k_max = 20
     n_runs = 3
     max_depth = 3
     sufix = "{dataset}_{depth}_{parent_topic}".format(dataset=dataset, depth=0, parent_topic='-1')
