@@ -170,7 +170,7 @@ def save_topics(model, tfidf_feature_names, cluwords_tfidf, best_k, topics_docum
 
                 classes[y[doc_id]].append(doc_id)
 
-            prefix = "{prefix}-{k}".format(prefix=out_prefix, k=k)
+            prefix = "{prefix} {k}".format(prefix=out_prefix, k=k)
             save_corpus(prefix, csr_matrix(cluwords_tfidf_temp), terms, doc_ids, classes)
             dq.appendleft(prefix)
         # else:
