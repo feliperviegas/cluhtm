@@ -258,7 +258,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                            corpus_path="{}.pkl".format(sufix),
                            dir_out_base="reference-{}".format(sufix),
                            kmin=k_min,
-                           maxiter=100,
+                           maxiter=10,
                            kmax=k_max)
         log.info("Generate NMF")
         GenerateNFM().run(dataset=dataset,
@@ -266,7 +266,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                           dir_out_base="topic-{}".format(sufix),
                           kmin=k_min,
                           kmax=k_max,
-                          maxiter=100,
+                          maxiter=10,
                           runs=n_runs)
         log.info("Topic Stability")
         dict_stability = {}
