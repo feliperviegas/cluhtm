@@ -271,12 +271,18 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
         log.info("Topic Stability")
         dict_stability = {}
         for k in range(k_min, k_max+1):
-            stability = TopicStability().run(dataset=dataset,
-                                             reference_rank_path="reference-{}/nmf_k{:02}/ranks_reference.pkl"
-                                             .format(sufix, k),
-                                             rank_paths=glob.glob("topic-{}/nmf_k{:02}/ranks*".format(sufix, k)),
-                                             top=10)
-            dict_stability[k] = stability
+            log.info("K iteration: {k}".format(k=k))
+            try:
+                stability = TopicStability().run(dataset=dataset,
+                                                 reference_rank_path="reference-{}/nmf_k{:02}/ranks_reference.pkl"
+                                                 .format(sufix, k),
+                                                 rank_paths=glob.glob("topic-{}/nmf_k{:02}/ranks*".format(sufix, k)),
+                                                 top=10)
+                dict_stability[k] = stability
+            except Exception as err:
+                
+                log.error("Error in k={k} => {err}".format(k=k, err=err))
+                k_max = k - 1
 
         best_k = max(dict_stability.keys(), key=(lambda key: dict_stability[key]))
         log.info("Selected K {k} => Stability({k}) = {stability} (median)".format(k=best_k,
