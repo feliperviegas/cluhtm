@@ -15,6 +15,7 @@ from generate_nmf import GenerateNFM
 from reference_nmf import ReferenceNFM
 from topic_stability import TopicStability
 from text.util import save_corpus, load_corpus
+from pyjarowinkler import distance
 from collections import deque
 
 
@@ -30,36 +31,6 @@ def top_words(model, feature_names, n_top_words):
         topico.append(str(top))
 
     return topico
-
-
-def print_results(model, tfidf_feature_names, cluwords_freq, cluwords_docs,
-                  dataset, path_to_save_results, path_to_save_model, sufix):
-    print(path_to_save_results)
-    for t in [5, 10, 20]:
-        with open('{}/{}_result_topic_{}.txt'.format(path_to_save_results, sufix, t), 'w', encoding="utf-8") as f_res:
-            f_res.write('Topics {}\n'.format(t))
-            topics = top_words(model, tfidf_feature_names, t)
-            f_res.write('{}\n'.format(topics))
-            log.info('Coherence Metric...')
-            coherence = Evaluation.coherence(topics, cluwords_freq, cluwords_docs)
-            f_res.write('Coherence: {} ({})\n'.format(np.round(np.mean(coherence), 4), np.round(np.std(coherence), 4)))
-            f_res.write('{}\n'.format(coherence))
-            log.info('PMI Metric...')
-            for word, freq in cluwords_freq.items():
-                log.info('w {} f {}'.format(word, freq))
-
-            pmi, npmi = Evaluation.pmi(topics, cluwords_freq, cluwords_docs,
-                                       sum([freq for word, freq in cluwords_freq.items()]), t)
-            f_res.write('PMI: {} ({})\n'.format(np.round(np.mean(pmi), 4), np.round(np.std(pmi), 4)))
-            f_res.write('{}\n'.format(pmi))
-            f_res.write('NPMI: {} ({})\n'.format(np.round(np.mean(npmi), 4), np.round(np.std(npmi), 4)))
-            f_res.write('{}\n'.format(npmi))
-            log.info('W2V-L1 Metric...')
-            w2v_l1 = Evaluation.w2v_metric(topics, t, path_to_save_model, 'l1_dist', dataset)
-            f_res.write('W2V-L1: {} ({})\n'.format(np.round(np.mean(w2v_l1), 4), np.round(np.std(w2v_l1), 4)))
-            f_res.write('{}\n'.format(w2v_l1))
-
-            f_res.close()
 
 
 def save_results(model, tfidf_feature_names, path_to_save_model, dataset, cluwords_freq,
@@ -140,13 +111,49 @@ def set_cluwords_representation(dataset, out_prefix, X, class_path):
     return y
 
 
+def remove_redundant_words(topics):
+    topics_t = []
+    for topic in topics:
+        filtered_topic = []
+        insert_word = np.ones(len(topic))
+        for w_i in range(0, len(topic)-1):
+            if insert_word[w_i]:
+                filtered_topic.append(topic[w_i])
+                for w_j in range((w_i + 1), len(topic)):
+                    if distance.get_jaro_distance(topic[w_i], topic[w_j], winkler=True, scaling=0.1) > 0.75:
+                        insert_word[w_j] = 0
+
+        topics_t.append(filtered_topic)
+
+    return topics_t
+
+
 def save_topics(model, tfidf_feature_names, cluwords_tfidf, best_k, topics_documents, y, doc_ids, terms, out_prefix,
-                dq, k_max, depth, parent, hierarchy, max_depth):
-    topics = top_words(model, tfidf_feature_names, 20)
+                dq, k_max, depth, parent, hierarchy, hierarchy_npmi, max_depth):
+    topics = top_words(model, tfidf_feature_names, 101)
+    # Load Cluwords representation for metrics
+    cluwords_freq, cluwords_docs, n_docs = Evaluation.count_tf_idf_repr(topics,
+                                                                        np.asarray(tfidf_feature_names),
+                                                                        cluwords_tfidf.transpose())
+
+    # # TODO - Add later
+    # topics = remove_redundant_words(topics)
+    #
+    top_words_selected = 20
+    topics_top_t = []
+    for topic in topics:
+        topics_top_t.append(topic.split(" ")[:top_words_selected])
+
+    pmi, npmi = Evaluation.pmi(topics=topics_top_t,
+                               word_frequency=cluwords_freq,
+                               term_docs=cluwords_docs,
+                               n_docs=n_docs,
+                               n_top_words=top_words_selected)
+
     for k in range(0, best_k):
         topic = np.argwhere(topics_documents == k)
         topic = topic.ravel()
-        cluwords_tfidf_temp = cluwords_tfidf.copy()
+        cluwords_tfidf_temp = cluwords_tfidf.toarray().copy()
         cluwords_tfidf_temp = cluwords_tfidf_temp[topic, :]
 
         doc_ids_temp = doc_ids.copy()
@@ -158,10 +165,18 @@ def save_topics(model, tfidf_feature_names, cluwords_tfidf, best_k, topics_docum
         if parent not in hierarchy[depth]:
             hierarchy[depth][parent] = {}
 
-        hierarchy[depth][parent][k] = topics[k]
+        hierarchy[depth][parent][k] = topics_top_t[k]
+
+        if depth not in hierarchy_npmi:
+            hierarchy_npmi[depth] = {}
+
+        if parent not in hierarchy_npmi[depth]:
+            hierarchy_npmi[depth][parent] = {}
+
+        hierarchy_npmi[depth][parent][k] = npmi[k]
+
         classes = {}
-        if len(doc_ids_temp) > k_max  and depth+1 < max_depth:
-        # if depth < max_depth:
+        if len(doc_ids_temp) > k_max and depth+1 < max_depth:
             log.info("Add topic: {} Shape Matrix: {}".format(k, cluwords_tfidf_temp.shape))
             log.info("len(doc_ids): {}".format(len(doc_ids_temp)))
             for doc_id in doc_ids:
@@ -177,10 +192,10 @@ def save_topics(model, tfidf_feature_names, cluwords_tfidf, best_k, topics_docum
         #     log.info("Exclude topic: {} Shape Matrix: {}".format(k, cluwords_tfidf_temp.shape))
         #     log.info("len(doc_ids): {}".format(len(doc_ids_temp)))
 
-    return dq, hierarchy
+    return dq, hierarchy, hierarchy_npmi
 
 
-def print_herarchical_structure(output, hierarchy, depth=0, parent='-1', son=0):
+def print_herarchical_structure(output, hierarchy, hierarchy_npmi, depth=0, parent='-1', son=0):
     # print('{} {} {}'.format(depth, parent, son))
     if depth not in hierarchy:
         return
@@ -192,10 +207,10 @@ def print_herarchical_structure(output, hierarchy, depth=0, parent='-1', son=0):
         return
 
     tabulation = '\t' * depth
-    output.write('{}{}\n'.format(tabulation, hierarchy[depth][parent][son]))
-    print_herarchical_structure(output, hierarchy, depth=depth + 1, parent='{} {}'.format(parent, son),
+    output.write('{}{} ({})\n'.format(tabulation, hierarchy[depth][parent][son], hierarchy_npmi[depth][parent][son]))
+    print_herarchical_structure(output, hierarchy, hierarchy_npmi, depth=depth + 1, parent='{} {}'.format(parent, son),
                                 son=0)
-    print_herarchical_structure(output, hierarchy, depth=depth, parent=parent, son=son + 1)
+    print_herarchical_structure(output, hierarchy, hierarchy_npmi, depth=depth, parent=parent, son=son + 1)
     return
 
 
@@ -244,6 +259,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                                     class_path)
     dq = deque([sufix])
     hierarchy = {}
+    hierarchy_npmi = {}
     while dq:
         log.info("Deque {}".format(dq))
         log.info("Documents {}".format(dataset))
@@ -303,23 +319,24 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
 
         log.info("\n>>X shape = {}".format(X.shape))
 
-        dq, hierarchy = save_topics(model=nmf,
-                                    tfidf_feature_names=tfidf_feature_names,
-                                    cluwords_tfidf=X.toarray(),
-                                    best_k=best_k,
-                                    topics_documents=topics_documents,
-                                    y=y,
-                                    doc_ids=np.array(doc_ids),
-                                    terms=terms,
-                                    out_prefix="{dataset}_{depth}_{parent_topic}".format(dataset=dataset,
-                                                                                         depth=depth+1,
-                                                                                         parent_topic=parent),
-                                    dq=dq,
-                                    k_max=k_max,
-                                    depth=depth,
-                                    parent=parent,
-                                    hierarchy=hierarchy,
-                                    max_depth=max_depth)
+        dq, hierarchy, hierarchy_npmi = save_topics(model=nmf,
+                                                    tfidf_feature_names=tfidf_feature_names,
+                                                    cluwords_tfidf=X,
+                                                    best_k=best_k,
+                                                    topics_documents=topics_documents,
+                                                    y=y,
+                                                    doc_ids=np.array(doc_ids),
+                                                    terms=terms,
+                                                    out_prefix="{dataset}_{depth}_{parent_topic}".format(dataset=dataset,
+                                                                                                         depth=depth+1,
+                                                                                                         parent_topic=parent),
+                                                    dq=dq,
+                                                    k_max=k_max,
+                                                    depth=depth,
+                                                    parent=parent,
+                                                    hierarchy=hierarchy,
+                                                    hierarchy_npmi=hierarchy_npmi,
+                                                    max_depth=max_depth)
 
         shutil.rmtree("reference-{}".format(sufix))
         shutil.rmtree("topic-{}".format(sufix))
@@ -330,7 +347,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
     log.info(hierarchy)
 
     output = open('{}/hierarchical_struture.txt'.format(path_to_save_results), 'w', encoding="utf-8")
-    print_herarchical_structure(output=output, hierarchy=hierarchy)
+    print_herarchical_structure(output=output, hierarchy=hierarchy, hierarchy_npmi=hierarchy_npmi)
     output.close()
 
 
