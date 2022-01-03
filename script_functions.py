@@ -274,7 +274,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                            corpus_path="{}.pkl".format(sufix),
                            dir_out_base="reference-{}".format(sufix),
                            kmin=k_min,
-                           maxiter=10,
+                           maxiter=50,
                            kmax=k_max)
         log.info("Generate NMF")
         GenerateNFM().run(dataset=dataset,
@@ -282,7 +282,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                           dir_out_base="topic-{}".format(sufix),
                           kmin=k_min,
                           kmax=k_max,
-                          maxiter=10,
+                          maxiter=50,
                           runs=n_runs)
         log.info("Topic Stability")
         dict_stability = {}
@@ -308,10 +308,11 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
         # Fit the NMF model
         log.info("\nFitting the NMF model (Frobenius norm) with tf-idf features, shape {}...".format(X.shape))
         nmf = NMF(n_components=best_k,
-                  init=None,
+                  init='nndsvd',
                   random_state=1,
                   alpha=.1,
-                  l1_ratio=.5).fit(X)
+                  l1_ratio=.5,
+                  max_iter=1000).fit(X)
 
         w = nmf.fit_transform(X)  # matrix W = m x k
         tfidf_feature_names = list(cluwords.vocab_cluwords)
