@@ -30,7 +30,7 @@ Build docker container:
 
 Run docker container:
 
-```docker run --rm --name cluthm -v <project_path>:/cluhtm -i -t cluhtm /bin/bash```
+```docker run --rm --name cluthm -v `pwd`:/cluhtm -i -t cluhtm /bin/bash```
 
 To run the code:
 
