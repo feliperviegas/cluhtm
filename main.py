@@ -23,6 +23,7 @@ def main():
     DATASETS_PATH = '/{}/textual_folds/{}Pre.txt'.format(MAIN_PATH, DATASET)
     CLASS_PATH = '/{}/textual_folds/{}Class.txt'.format(MAIN_PATH, DATASET)
     EMBEDDINGS_FILE_PATH = '/{}/wiki-news-300d-1M.vec'.format(MAIN_PATH)
+    EMBEDDINGS_DIMENSION = 300
     # EMBEDDINGS_FILE_PATH = '{}/embedding_viegas_concat/embedding_{}Pre_bert_concat_avg'.format(MAIN_PATH,
     #                                                                                            DATASET)
     # EMBEDDINGS_FILE_PATH = '{}/viegas_dataset_avg_max/embedding_{}Pre_avg'.format(MAIN_PATH,
@@ -40,6 +41,7 @@ def main():
     print('Filter embedding space to {} dataset...'.format(DATASET))
     n_words = create_embedding_models(dataset=DATASET,
                                       embedding_file_path=EMBEDDINGS_FILE_PATH,
+                                      embedding_dimension=EMBEDDINGS_DIMENSION,
                                       embedding_type=EMBEDDINGS_BIN_TYPE,
                                       datasets_path=DATASETS_PATH,
                                       path_to_save_model=PATH_TO_SAVE_MODEL)
