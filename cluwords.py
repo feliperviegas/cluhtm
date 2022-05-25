@@ -110,7 +110,7 @@ class CluwordsTFIDF:
 
     """
 
-    def __init__(self, dataset, dataset_file_path, n_words, path_to_save_cluwords, class_file_path=None):
+    def __init__(self, dataset, dataset_file_path, n_words, path_to_save_cluwords, class_file_path=None, supervised=False):
         self.dataset_file_path = dataset_file_path
         self.path_to_save_cluwords_tfidf = path_to_save_cluwords + '/cluwords_features.libsvm'
         self.n_words = n_words
@@ -122,11 +122,14 @@ class CluwordsTFIDF:
         self.cluwords_data = loaded['data']
 
         self.Y = []
-        with open(class_file_path, 'r', encoding="utf-8") as input_file:
-            for _class in input_file:
-                self.Y.append(np.int(_class))
-            input_file.close()
-            self.Y = np.asarray(self.Y)
+        if supervised:
+            with open(class_file_path, 'r', encoding="utf-8") as input_file:
+                for _class in input_file:
+                    self.Y.append(np.int(_class))
+                
+                input_file.close()
+            
+        self.Y = np.asarray(self.Y)
 
         print('Matrix{}'.format(self.cluwords_data.shape))
         del loaded
@@ -273,11 +276,27 @@ class CluwordsTFIDF:
 
     def _save_tf_idf_features_libsvm(self):
         tf = self._raw_tf(binary=True, dtype=np.float32)
-        with open('{}'.format(self.path_to_save_cluwords_tfidf), 'w', encoding="utf-8") as file:
-            for x in range(self.cluwords_tf_idf.shape[0]):
-                file.write('{} '.format(self.Y[x]))
-                for y in range(1, self.cluwords_tf_idf.shape[1]):
-                    if tf[x][y]:
-                        file.write('{}:{} '.format(y + 1, self.cluwords_tf_idf[x][y]))
-                file.write('\n')
-            file.close()
+        if self.Y.shape[0] != 0:
+            with open('{}'.format(self.path_to_save_cluwords_tfidf), 'w', encoding="utf-8") as file:
+                for x in range(self.cluwords_tf_idf.shape[0]):
+                    file.write('{} '.format(self.Y[x]))
+                    for y in range(1, self.cluwords_tf_idf.shape[1]):
+                        if tf[x][y]:
+                            file.write('{}:{} '.format(y + 1, self.cluwords_tf_idf[x][y]))
+                    
+                    file.write('\n')
+                
+                file.close()
+        else: # Dataset does not have class
+            with open('{}'.format(self.path_to_save_cluwords_tfidf), 'w', encoding="utf-8") as file:
+                for x in range(self.cluwords_tf_idf.shape[0]):
+                    file.write('0 ')
+                    for y in range(1, self.cluwords_tf_idf.shape[1]):
+                        if tf[x][y]:
+                            file.write('{}:{} '.format(y + 1, self.cluwords_tf_idf[x][y]))
+                
+                    file.write('\n')
+                
+                file.close()
+
+
