@@ -24,7 +24,8 @@ class CreateEmbeddingModels:
         To specify if the pre-treined embedding model is binary.
     """
 
-    def __init__(self, embedding_file_path, embedding_type, document_path, path_to_save_model):
+    def __init__(self, embedding_file_path, embedding_dimension, 
+                    embedding_type, document_path, path_to_save_model):
         self.document_path = document_path
         self.path_to_save_model = path_to_save_model
         self._read_embedding(embedding_file_path, embedding_type)
@@ -74,7 +75,7 @@ class CreateEmbeddingModels:
 
         # save .txt model
         file = open("""{}/{}.txt""".format(self.path_to_save_model, dataset), 'w+', encoding="utf-8")
-        file.write('{0} {1}\n'.format(n_words, '300'))
+        file.write('{0} {1}\n'.format(n_words, embedding_dimension))
         # file.write('{0} {1}\n'.format(n_words, '768'))
         # file.write('{0} {1}\n'.format(n_words, '3072'))
         for word_vec in words_values:

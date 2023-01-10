@@ -75,10 +75,12 @@ def save_results(model, tfidf_feature_names, path_to_save_model, dataset, cluwor
     df_mean.to_csv(path_or_buf='{}/results.csv'.format(path_to_save_results))
 
 
-def create_embedding_models(dataset, embedding_file_path, embedding_type, datasets_path, path_to_save_model):
+def create_embedding_models(dataset, embedding_file_path, embedding_dimension,
+                            embedding_type, datasets_path, path_to_save_model):
     # Create the word2vec models for each dataset
     word2vec_models = CreateEmbeddingModels(embedding_file_path=embedding_file_path,
                                             embedding_type=embedding_type,
+                                            embedding_dimension=embedding_dimension
                                             document_path=datasets_path,
                                             path_to_save_model=path_to_save_model)
     n_words = word2vec_models.create_embedding_models(dataset)

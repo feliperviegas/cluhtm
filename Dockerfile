@@ -1,5 +1,5 @@
 #Download base image ubuntu 16.04
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 COPY . /cluhtm
 WORKDIR /cluhtm
