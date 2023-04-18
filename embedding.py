@@ -30,6 +30,7 @@ class CreateEmbeddingModels:
         self.path_to_save_model = path_to_save_model
         self._read_embedding(embedding_file_path, embedding_type)
         self._make_dir(path_to_save_model)
+        self.embedding_dimension = embedding_dimension
 
     def create_embedding_models(self, dataset):
         """
@@ -75,9 +76,7 @@ class CreateEmbeddingModels:
 
         # save .txt model
         file = open("""{}/{}.txt""".format(self.path_to_save_model, dataset), 'w+', encoding="utf-8")
-        file.write('{0} {1}\n'.format(n_words, embedding_dimension))
-        # file.write('{0} {1}\n'.format(n_words, '768'))
-        # file.write('{0} {1}\n'.format(n_words, '3072'))
+        file.write('{0} {1}\n'.format(n_words, self.embedding_dimension))
         for word_vec in words_values:
             file.write("%s\n" % word_vec)
 

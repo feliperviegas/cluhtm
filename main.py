@@ -11,21 +11,22 @@ def main():
                       help="base output directory (default is current directory)", default=None)
     options, args = parser.parse_args()
     # Paths and files paths
-    MAIN_PATH = '/cluhtm'
-    EMBEDDING_RESULTS = 'fasttext_wiki'
-    PATH_TO_SAVE_RESULTS = '{}/{}/results'.format(MAIN_PATH, EMBEDDING_RESULTS)
-    PATH_TO_SAVE_MODEL = '{}/{}/datasets/gn_w2v_models'.format(MAIN_PATH, EMBEDDING_RESULTS)
+    MAIN_PATH = "/home/local/FARFETCH/felipe.viegas/repo/cluhtm"
+    EMBEDDING_RESULTS = "fasttext_wiki"
+    PATH_TO_SAVE_RESULTS = f"{MAIN_PATH}/{EMBEDDING_RESULTS}/results"
+    PATH_TO_SAVE_MODEL = f"{MAIN_PATH}/{EMBEDDING_RESULTS}/datasets/gn_w2v_models"
     EMBEDDINGS_BIN_TYPE = False
     DATASET = options.dataset
     N_THREADS = 6
-    ALGORITHM_TYPE = 'knn_cosine'
+    ALGORITHM_TYPE = "knn_cosine"
 
-    DATASETS_PATH = '/{}/textual_folds/{}Pre.txt'.format(MAIN_PATH, DATASET)
-    CLASS_PATH = '/{}/textual_folds/{}Class.txt'.format(MAIN_PATH, DATASET)
-    EMBEDDINGS_FILE_PATH = '/{}/wiki-news-300d-1M.vec'.format(MAIN_PATH)
-    EMBEDDINGS_DIMENSION = 300
-    # EMBEDDINGS_FILE_PATH = '{}/embedding_viegas_concat/embedding_{}Pre_bert_concat_avg'.format(MAIN_PATH,
-    #                                                                                            DATASET)
+    DATASETS_PATH = f"/{MAIN_PATH}/textual_folds/{DATASET}Pre.txt"
+    CLASS_PATH = f"/{MAIN_PATH}/textual_folds/{DATASET}Class.txt"
+    # EMBEDDINGS_FILE_PATH = '/{}/wiki-news-300d-1M.vec'.format(MAIN_PATH)
+    EMBEDDINGS_FILE_PATH = f"/{MAIN_PATH}/embedding_viegas_concat/embedding_{DATASET}Pre_bert_concat_avg"
+    # EMBEDDINGS_DIMENSION = 300
+    EMBEDDINGS_DIMENSION = 3072
+    SEED=42
     # EMBEDDINGS_FILE_PATH = '{}/viegas_dataset_avg_max/embedding_{}Pre_avg'.format(MAIN_PATH,
     #                                                                               DATASET)
 
@@ -56,18 +57,19 @@ def main():
                     algorithm_type=ALGORITHM_TYPE,
                     k=500,
                     threshold=0.4,
-                    class_path=CLASS_PATH)
+                    class_path=CLASS_PATH,
+                    seed=SEED)
 
-    save_cluword_representation(dataset=DATASET,
-                                word_count=n_words,
-                                path_to_save_model=PATH_TO_SAVE_MODEL,
-                                datasets_path=DATASETS_PATH,
-                                path_to_save_results=PATH_TO_SAVE_RESULTS,
-                                n_threads=N_THREADS,
-                                algorithm_type=ALGORITHM_TYPE,
-                                k=500,
-                                threshold=0.4,
-                                class_path=CLASS_PATH)
+    # save_cluword_representation(dataset=DATASET,
+    #                             word_count=n_words,
+    #                             path_to_save_model=PATH_TO_SAVE_MODEL,
+    #                             datasets_path=DATASETS_PATH,
+    #                             path_to_save_results=PATH_TO_SAVE_RESULTS,
+    #                             n_threads=N_THREADS,
+    #                             algorithm_type=ALGORITHM_TYPE,
+    #                             k=500,
+    #                             threshold=0.4,
+    #                             class_path=CLASS_PATH)
 
 
 if __name__ == '__main__':

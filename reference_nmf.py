@@ -13,7 +13,7 @@ import unsupervised.util
 
 class ReferenceNFM(object):
     @staticmethod
-    def run(dataset, corpus_path, dir_out_base, maxiter=10, kmin=5, kmax=5,seed=1000,
+    def run(dataset, corpus_path, dir_out_base, maxiter=10, kmin=5, kmax=5, seed=1000,
             top=10, write_factors=False, use_nimfa=False, debug=3):
         log.basicConfig(filename="{}_reference.log".format(dataset), filemode="w",
                         level=max(50 - (debug * 10), 10), format='%(asctime)-18s %(levelname)-10s [%(filename)s:%(lineno)d] %(message)s',

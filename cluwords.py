@@ -43,7 +43,8 @@ class Cluwords:
 
     """
 
-    def __init__(self, dataset, algorithm, embedding_file_path, n_words, k_neighbors, threshold=.85, n_jobs=1, verbose=0):
+    def __init__(self, dataset: str, algorithm: str, embedding_file_path: str, n_words: int,
+                 k_neighbors: int, threshold: float = .85, n_jobs: int = 1, verbose: int = 0):
         if verbose:
             print('K: {}'.format(k_neighbors))
             print('Cossine: {}'.format(threshold))

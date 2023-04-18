@@ -1,6 +1,7 @@
 # Packages
 import os
 import shutil
+
 import pandas as pd
 import numpy as np
 import logging as log
@@ -75,12 +76,12 @@ def save_results(model, tfidf_feature_names, path_to_save_model, dataset, cluwor
     df_mean.to_csv(path_or_buf='{}/results.csv'.format(path_to_save_results))
 
 
-def create_embedding_models(dataset, embedding_file_path, embedding_dimension,
-                            embedding_type, datasets_path, path_to_save_model):
+def create_embedding_models(dataset: str, embedding_file_path: str, embedding_dimension: int,
+                            embedding_type: bool, datasets_path: str, path_to_save_model: str) -> int:
     # Create the word2vec models for each dataset
     word2vec_models = CreateEmbeddingModels(embedding_file_path=embedding_file_path,
                                             embedding_type=embedding_type,
-                                            embedding_dimension=embedding_dimension
+                                            embedding_dimension=embedding_dimension,
                                             document_path=datasets_path,
                                             path_to_save_model=path_to_save_model)
     n_words = word2vec_models.create_embedding_models(dataset)
@@ -216,8 +217,9 @@ def print_herarchical_structure(output, hierarchy, hierarchy_npmi, depth=0, pare
     return
 
 
-def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
-                    path_to_save_results, n_threads, k, threshold, class_path, algorithm_type, debug=3):
+def generate_topics(dataset: str, word_count: int, path_to_save_model: str, datasets_path: str,
+                    path_to_save_results: str, n_threads: int, k: int, threshold: float,
+                    class_path: str, algorithm_type: str, seed: int, debug=3):
     log.basicConfig(filename="{}.log".format(dataset), filemode="w", level=max(50 - (debug * 10), 10),
                     format='%(asctime)-18s %(levelname)-10s [%(filename)s:%(lineno)d] %(message)s',
                     datefmt='%d/%m/%Y %H:%M', )
@@ -251,7 +253,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
     cluwords_tfidf_temp = csr_matrix(cluwords_tfidf_temp)  # Convert the cluwords_tfidf array matrix to a sparse cluwords
     # RANGE OF TOPICS THAT WILL BE EXPLOIT BY THE STRATEGY
     k_min = 5
-    k_max = 20
+    k_max = 25
     n_runs = 3
     max_depth = 3
     sufix = "{dataset}_{depth}_{parent_topic}".format(dataset=dataset, depth=0, parent_topic='-1')
@@ -277,7 +279,8 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                            dir_out_base="reference-{}".format(sufix),
                            kmin=k_min,
                            maxiter=50,
-                           kmax=k_max)
+                           kmax=k_max,
+                           seed=seed)
         log.info("Generate NMF")
         GenerateNFM().run(dataset=dataset,
                           corpus_path="{}.pkl".format(sufix),
@@ -285,7 +288,8 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
                           kmin=k_min,
                           kmax=k_max,
                           maxiter=50,
-                          runs=n_runs)
+                          runs=n_runs,
+                          seed=seed)
         log.info("Topic Stability")
         dict_stability = {}
         for k in range(k_min, k_max+1):
@@ -311,7 +315,7 @@ def generate_topics(dataset, word_count, path_to_save_model, datasets_path,
         log.info("\nFitting the NMF model (Frobenius norm) with tf-idf features, shape {}...".format(X.shape))
         nmf = NMF(n_components=best_k,
                   init='nndsvd',
-                  random_state=1,
+                  random_state=seed,
                   alpha=.1,
                   l1_ratio=.5,
                   max_iter=1000).fit(X)
