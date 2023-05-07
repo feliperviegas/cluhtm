@@ -26,7 +26,7 @@ def main():
     EMBEDDINGS_FILE_PATH = f"/{MAIN_PATH}/embedding_viegas_concat/embedding_{DATASET}Pre_bert_concat_avg"
     # EMBEDDINGS_DIMENSION = 300
     EMBEDDINGS_DIMENSION = 3072
-    SEED=42
+    SEED=45
     # EMBEDDINGS_FILE_PATH = '{}/viegas_dataset_avg_max/embedding_{}Pre_avg'.format(MAIN_PATH,
     #                                                                               DATASET)
 
@@ -60,16 +60,16 @@ def main():
                     class_path=CLASS_PATH,
                     seed=SEED)
 
-    # save_cluword_representation(dataset=DATASET,
-    #                             word_count=n_words,
-    #                             path_to_save_model=PATH_TO_SAVE_MODEL,
-    #                             datasets_path=DATASETS_PATH,
-    #                             path_to_save_results=PATH_TO_SAVE_RESULTS,
-    #                             n_threads=N_THREADS,
-    #                             algorithm_type=ALGORITHM_TYPE,
-    #                             k=500,
-    #                             threshold=0.4,
-    #                             class_path=CLASS_PATH)
+    save_cluword_representation(dataset=DATASET,
+                                word_count=n_words,
+                                path_to_save_model=PATH_TO_SAVE_MODEL,
+                                datasets_path=DATASETS_PATH,
+                                path_to_save_results=PATH_TO_SAVE_RESULTS,
+                                n_threads=N_THREADS,
+                                algorithm_type=ALGORITHM_TYPE,
+                                k=500,
+                                threshold=0.4,
+                                class_path=CLASS_PATH)
 
 
 if __name__ == '__main__':
